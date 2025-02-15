@@ -9,7 +9,7 @@ exports.registration = async (req, res) => {
         await UserModel.create(reqBody);
         res.status(200).json({status: "success", message: "Product created"});
     } catch (err) {
-        res.status(400).json({status: "fail", message: err.toString()});
+        res.status(400).json({status: "fail", message: err});
     }
 
 }
