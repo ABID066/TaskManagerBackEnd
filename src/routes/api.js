@@ -13,6 +13,7 @@ const router = express.Router();
 router.post("/registration",UserController.registration);
 router.post("/login",UserController.login);
 router.post("/profile-update",AuthVerify,UserController.profileUpdate);
+router.get("/profile-details",AuthVerify,UserController.profileDetails);
 
 //task
 router.post("/create-task",AuthVerify,TaskController.createTask);
