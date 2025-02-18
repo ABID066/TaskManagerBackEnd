@@ -6,7 +6,7 @@ exports.createTask = async (req, res) => {
         let reqBody = req.body;
         reqBody.email = req.headers.email;
         await TaskModel.create(reqBody);
-        res.status(200).json({status: "success", message: "Product created"});
+        res.status(200).json({status: "success", message: "Task created"});
     } catch (err) {
         res.status(400).json({status: "fail", message: err.toString()});
     }

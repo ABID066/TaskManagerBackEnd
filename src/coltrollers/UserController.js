@@ -7,7 +7,7 @@ exports.registration = async (req, res) => {
     try {
         let reqBody = req.body;
         await UserModel.create(reqBody);
-        res.status(200).json({status: "success", message: "Product created"});
+        res.status(200).json({status: "success", message: "User Registration Complete"});
     } catch (err) {
         res.status(200).json({status: "fail", message: err});
     }
@@ -38,11 +38,7 @@ exports.login = async (req, res) => {
         let token = jwt.sign(payload, process.env.JWT_SECRET);
 
         // Send response
-        res.status(200).json({
-            status: "success",
-            token: token,
-            data: data[0]
-        });
+        res.status(200).json({status: "success", token: token, data: data[0]});
 
     } catch (err) {
         res.status(500).json({ status: "fail", message: err.message || "Internal Server Error" });
@@ -55,7 +51,7 @@ exports.profileUpdate=async (req,res)=>{
     try {
         let email= req.headers["email"]
         await UserModel.updateOne({email: email},req.body);
-        res.json({status:"success",message:"Product updated"});
+        res.json({status:"success",message:"Profile updated"});
     } catch(err) {
         res.json({status:"fail",message:err.toString()});
     }
