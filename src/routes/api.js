@@ -15,6 +15,9 @@ router.post("/login",UserController.login);
 router.post("/profile-update",AuthVerify,UserController.profileUpdate);
 router.get("/profile-details",AuthVerify,UserController.profileDetails);
 
+//Recovery password
+router.get("/verify-user/:email",UserController.VerifyUserEmail)
+
 //task
 router.post("/create-task",AuthVerify,TaskController.createTask);
 router.get("/update-task-status/:id/:status",AuthVerify,TaskController.updateTaskStatus);

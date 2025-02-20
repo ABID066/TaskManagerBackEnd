@@ -1,5 +1,7 @@
 const UserModel = require('../models/UsersModel');
 const jwt = require('jsonwebtoken');
+const OTPModel = require("../models/OTPModel");
+const SendEmailUtility = require("../utilites/SendEmailUtility");
 
 
 //registration
@@ -69,4 +71,28 @@ exports.profileDetails = async (req,res)=>{
     } catch (err) {
         res.status(400).json({status:"fail",message:err.toString()});
     }
+}
+
+//
+exports.VerifyUserEmail = async (req,res)=>{
+    let email = req.params.email;
+    let OTPCode = Math.floor(100000+Math.random()*900000)
+
+    try {
+        let UserCount = await UserModel.aggregate([
+            {$match:{email: email}},
+            {$count: "total"}
+        ])
+        if(UserCount>0){
+            let CreateOTP = await OTPModel.create({email: email, otp: OTPCode})
+            let SendEmail = await SendEmailUtility(email, OTPCode)
+            res.status(200).json({status:"success",result:SendEmail});
+        } else {
+            res.status(200).json({status:"fail",message:"No User Found"})
+        }
+
+    } catch (e) {
+        res.status(400).json({status:"fail",message:e.toString()});
+    }
+
 }
