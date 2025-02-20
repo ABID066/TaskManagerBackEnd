@@ -74,25 +74,27 @@ exports.profileDetails = async (req,res)=>{
 }
 
 //
-exports.VerifyUserEmail = async (req,res)=>{
-    let email = req.params.email;
-    let OTPCode = Math.floor(100000+Math.random()*900000)
-
+exports.VerifyUserEmail = async (req, res) => {
     try {
+        let email = req.params.email;
+        let OTPCode = Math.floor(100000 + Math.random() * 900000);
+
         let UserCount = await UserModel.aggregate([
-            {$match:{email: email}},
-            {$count: "total"}
-        ])
-        if(UserCount>0){
-            let CreateOTP = await OTPModel.create({email: email, otp: OTPCode})
-            let SendEmail = await SendEmailUtility(email, OTPCode)
-            res.status(200).json({status:"success",result:SendEmail});
+            { $match: { email: email } },
+            { $count: "total" }
+        ]);
+
+        // Check if user exists properly
+        if (UserCount.length > 0 && UserCount[0].total > 0) {
+            await OTPModel.create({ email: email, otp: OTPCode });
+            let SendEmail = await SendEmailUtility(email, OTPCode);
+
+            res.status(200).json({ status: "success", result: SendEmail });
         } else {
-            res.status(200).json({status:"fail",message:"No User Found"})
+            res.status(200).json({ status: "fail", message: "No User Found" });
         }
-
     } catch (e) {
-        res.status(400).json({status:"fail",message:e.toString()});
+        res.status(400).json({ status: "fail", message: e.toString() });
     }
+};
 
-}
