@@ -17,6 +17,8 @@ router.get("/profile-details",AuthVerify,UserController.profileDetails);
 
 //Recovery password
 router.get("/verify-user/:email",UserController.VerifyUserEmail)
+router.get("/verify-otp/:email/:otp",UserController.VerifyOTP)
+router.post("/reset-password",UserController.ResetPassword)
 
 //task
 router.post("/create-task",AuthVerify,TaskController.createTask);

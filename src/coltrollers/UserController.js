@@ -62,6 +62,7 @@ exports.profileUpdate=async (req,res)=>{
 //Get Profile Details
 exports.profileDetails = async (req,res)=>{
     let email= req.headers["email"];
+
     try {
         let result= await UserModel.aggregate([
             {$match:{email: email}},
@@ -73,18 +74,17 @@ exports.profileDetails = async (req,res)=>{
     }
 }
 
-//
+//Recover Password 01: Send OTP
 exports.VerifyUserEmail = async (req, res) => {
-    try {
-        let email = req.params.email;
-        let OTPCode = Math.floor(100000 + Math.random() * 900000);
+    let email = req.params.email;
+    let OTPCode = Math.floor(100000 + Math.random() * 900000);
 
+    try {
         let UserCount = await UserModel.aggregate([
             { $match: { email: email } },
             { $count: "total" }
         ]);
 
-        // Check if user exists properly
         if (UserCount.length > 0 && UserCount[0].total > 0) {
             await OTPModel.create({ email: email, otp: OTPCode });
             let SendEmail = await SendEmailUtility(email, OTPCode);
@@ -98,3 +98,54 @@ exports.VerifyUserEmail = async (req, res) => {
     }
 };
 
+//Recover Password 02: Verify OTP
+exports.VerifyOTP = async (req, res) => {
+    let email = req.params.email;
+    let OTPCode =req.params.otp;
+    try {
+        let otpCount = await OTPModel.aggregate([
+            {$match: {email: email, otp: OTPCode, status: 0}},
+            {$count: "total"}
+        ])
+        if (otpCount.length > 0 && otpCount[0].total > 0) {
+            let otpStatus = await OTPModel.updateOne(
+                {email: email, otp: OTPCode, status: 0},
+                {status: 1}
+            )
+            res.status(200).json({ status: "success", message: otpStatus });
+        } else {
+            res.status(200).json({ status: "fail", message: "Invalid OTP Code" });
+        }
+    } catch (e) {
+        res.status(400).json({ status: "fail", message: e.toString() });
+    }
+}
+
+//Recover Password 03: Verify OTP
+exports.ResetPassword = async (req, res) => {
+    try {
+        let email = req.body["email"];
+        let OTPCode = req.body["OTP"];
+        let NewPass = req.body["password"];
+        let otpUsedCount = await OTPModel.aggregate([
+            { $match: { email: email, otp: OTPCode, status: 1 } },
+            { $count: "total" }
+        ]);
+
+        if (otpUsedCount.length > 0  && otpUsedCount[0].total > 0) {
+            await OTPModel.deleteOne({email: email});
+            await UserModel.updateOne(
+                {email: email},
+                {password: NewPass}
+            );
+
+            res.json({status: "success", message: "Password changed successfully"});
+        }else {
+
+            res.status(200).json({ status: "fail", message: "Invalid OTP Code" });
+        }
+    } catch (err) {
+        res.json({ status: "fail", message: err.toString() });
+    }
+
+}
