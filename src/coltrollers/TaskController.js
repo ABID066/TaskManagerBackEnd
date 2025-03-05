@@ -53,6 +53,7 @@ exports.readByStatus = async (req, res) => {
         res.json({status:"fail",message:err.toString()});
     }
 }*/
+//update status
 exports.updateTaskStatus = async (req, res) => {
     try {
         let { id, status } = req.params;

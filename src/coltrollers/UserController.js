@@ -142,7 +142,7 @@ exports.ResetPassword = async (req, res) => {
             res.json({status: "success", message: "Password changed successfully"});
         }else {
 
-            res.status(200).json({ status: "fail", message: "Invalid OTP Code" });
+            res.status(200).json({ status: "fail", message: "Didn't work" });
         }
     } catch (err) {
         res.json({ status: "fail", message: err.toString() });
